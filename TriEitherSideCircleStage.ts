@@ -2,6 +2,7 @@ const w : number = window.innerWidth, h : number = window.innerHeight
 const tris : number = 2
 const scDiv : number = 0.51
 const scGap : number = 0.05
+const nodes : number = 5
 
 const getInverse: Function = (n : number) : number => 1 / n
 
@@ -89,4 +90,49 @@ class TriEitherSideCircleStage {
         stage.render()
         stage.handleTap()
     }
+}
+
+class TESCNode {
+    state : State = new State()
+    next : TESCNode
+    prev : TESCNode
+
+    constructor(private i : number) {
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new TESCNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    update(cb : Function) {
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
+    }
+
+    draw(cb : Function, context : CanvasRenderingContext2D) {
+        cb(context)
+        if (this.next) {
+            this.next.draw(cb, context)
+        }
+    }
+
+    getNext(dir : number, cb : Function) : TESCNode {
+        var curr : TESCNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this
+    }
+
 }
