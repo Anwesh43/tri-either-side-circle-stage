@@ -106,7 +106,7 @@ class Animator {
 class TriEitherSideCircleStage {
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D
-
+    renderer : Renderer = new Renderer()
     initCanvas() {
         this.canvas.width = w
         this.canvas.height = h
@@ -115,12 +115,14 @@ class TriEitherSideCircleStage {
     }
 
     render() {
-
+        this.renderer.render(this.context)
     }
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.renderer.handleTap(() => {
+                this.render()
+            })
         }
     }
 
