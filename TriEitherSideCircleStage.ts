@@ -1,17 +1,17 @@
 const w : number = window.innerWidth, h : number = window.innerHeight
-const tris : number = 2
+const tris : number = 4
 const scDiv : number = 0.51
 const scGap : number = 0.05
 const nodes : number = 5
 const sizeFactor : number = 3
-const strokeFactor : number = 3
-const triSizeFactor : number = 12
+const strokeFactor : number = 120
+const triSizeFactor : number = 4
 const color : String = '#1A237E'
 
 const getInverse: Function = (n : number) : number => 1 / n
 
 const divideScale : Function = (scale : number, i : number, n : number) : number => {
-    return Math.min(getInverse(n), Math.max(0, scale - i * getInverse(n)))
+    return Math.min(getInverse(n), Math.max(0, scale - i * getInverse(n))) * n
 }
 
 const scaleFactor : Function = (scale : number) : number => Math.floor(scale / scDiv)
@@ -31,7 +31,7 @@ const drawTESCNode : Function = (context : CanvasRenderingContext2D, i : number,
     const gap : number = w / (nodes + 1)
     const size : number = gap / sizeFactor
     const deg : number = (2 * Math.PI) / (tris)
-    const lSize : number = size / 10
+    const lSize : number = size / triSizeFactor
     context.lineCap = 'round'
     context.lineWidth = Math.min(w, h) / strokeFactor
     context.strokeStyle = color
@@ -47,13 +47,15 @@ const drawTESCNode : Function = (context : CanvasRenderingContext2D, i : number,
     context.arc(0, 0, (size - context.lineWidth/2), 0, 2 * Math.PI)
     context.stroke()
     for (var j = 0; j < tris; j++) {
-        const sc : number = divideScale(sc1, i, tris)
+        const sc : number = divideScale(sc1, j, tris)
+        console.log(sc)
         context.save()
-        context.translate(0, -size)
+        context.rotate(deg * j)
+        context.translate(0, size)
         context.beginPath()
-        context.moveTo(-size/triSizeFactor, 0)
-        context.lineTo(size/triSizeFactor, 0)
-        context.lineTo(0, -size/(triSizeFactor/2))
+        context.moveTo(-lSize/2, 0)
+        context.lineTo(lSize/2, 0)
+        context.lineTo(0, -lSize * sc)
         context.fill()
         context.restore()
     }
@@ -97,7 +99,7 @@ class Animator {
 
     stop() {
         if (this.animated) {
-            this.animated = true
+            this.animated = false
             clearInterval(this.interval)
         }
     }
@@ -195,6 +197,7 @@ class TriEitherSideCircle {
             this.curr = this.curr.getNext(this.dir, () => {
                 this.dir *= -1
             })
+            console.log(this.curr)
             cb()
         })
     }
