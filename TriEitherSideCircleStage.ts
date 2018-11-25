@@ -3,6 +3,10 @@ const tris : number = 2
 const scDiv : number = 0.51
 const scGap : number = 0.05
 const nodes : number = 5
+const sizeFactor : number = 3
+const strokeFactor : number = 3
+const triSizeFactor : number = 12
+const color : String = '#1A237E'
 
 const getInverse: Function = (n : number) : number => 1 / n
 
@@ -19,6 +23,42 @@ const mirrorValue : Function = (scale : number, a : number, b : number) : number
 
 const updateScale : Function = (scale : number, a : number, b : number, dir : number) : number =>{
     return mirrorValue(scale, a , b) * scGap * dir
+}
+
+const drawTESCNode : Function = (context : CanvasRenderingContext2D, i : number, scale : number) => {
+    const sc1 : number = divideScale(scale, 0, 2)
+    const sc2 : number = divideScale(scale, 1, 2)
+    const gap : number = w / (nodes + 1)
+    const size : number = gap / sizeFactor
+    const deg : number = (2 * Math.PI) / (tris)
+    const lSize : number = size / 10
+    context.lineCap = 'round'
+    context.lineWidth = Math.min(w, h) / strokeFactor
+    context.strokeStyle = color
+    context.fillStyle = color
+    context.save()
+    context.translate(gap * (i + 1), h/2)
+    context.rotate(Math.PI/2 * sc2)
+    context.save()
+    context.beginPath()
+    context.arc(0, 0, size, 0, 2 * Math.PI)
+    context.clip()
+    context.beginPath()
+    context.arc(0, 0, (size - context.lineWidth/2), 0, 2 * Math.PI)
+    context.stroke()
+    for (var j = 0; j < tris; j++) {
+        const sc : number = divideScale(sc1, i, tris)
+        context.save()
+        context.translate(0, -size)
+        context.beginPath()
+        context.moveTo(-size/triSizeFactor, 0)
+        context.lineTo(size/triSizeFactor, 0)
+        context.lineTo(0, -size/(triSizeFactor/2))
+        context.fill()
+        context.restore()
+    }
+    context.restore()
+    context.restore()
 }
 
 class State {
@@ -117,7 +157,7 @@ class TESCNode {
     }
 
     draw(cb : Function, context : CanvasRenderingContext2D) {
-        cb(context)
+        cb(context, this.i, this.state.scale)
         if (this.next) {
             this.next.draw(cb, context)
         }
