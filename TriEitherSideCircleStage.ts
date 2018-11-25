@@ -174,5 +174,30 @@ class TESCNode {
         cb()
         return this
     }
+}
 
+class TriEitherSideCircle {
+    root : TESCNode = new TESCNode(0)
+    curr : TESCNode = this.root
+    dir : number = 1
+    draw(context : CanvasRenderingContext2D ) {
+        if (this.root) {
+            this.root.draw((ctx : CanvasRenderingContext2D, i : number, scale : number) => {
+                drawTESCNode(ctx, i, scale)
+            }, context)
+        }
+    }
+
+    update(cb : Function) {
+        this.curr.update(() => {
+            this.curr = this.curr.getNext(this.dir, () => {
+                this.dir *= -1
+            })
+            cb()
+        })
+    }
+
+    startUpdating(cb : Function) {
+        this.curr.startUpdating(cb)
+    }
 }
