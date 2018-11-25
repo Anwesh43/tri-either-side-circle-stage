@@ -201,3 +201,26 @@ class TriEitherSideCircle {
         this.curr.startUpdating(cb)
     }
 }
+
+class Renderer {
+    tesc : TriEitherSideCircle = new TriEitherSideCircle()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        context.fillStyle = '#BDBDBD'
+        context.fillRect(0, 0, w, h)
+        this.tesc.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.tesc.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.tesc.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
+    }
+}
